@@ -1,0 +1,16 @@
+.headerContent{
+    background: #fff;
+    margin-bottom: 15px;
+    padding: 5px 0;
+    box-shadow: 0 0 15px #0000003b;
+}
+.logoBox{
+    max-width: 150px;
+}
+.logoBox img{
+    max-width: 180px;
+    width: 100%;
+}
+.callButton button{
+    font-size: 14px;
+} 

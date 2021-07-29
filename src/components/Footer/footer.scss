@@ -1,0 +1,57 @@
+@mixin media($mw: 1200px) {
+    @media screen and (max-width: $mw) {
+      @content;
+    }
+  }
+.footerSection{
+    background: #e8e8e8;
+    padding: 30px 0;
+}
+.footer-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.left-footer-box{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+.footerCardImg{
+    max-width: 1400px;    
+}
+.footerCardImg2{
+    margin: 0px 20px;
+    max-width: 60px;    
+}
+.footerCardImg img{
+    width: 100%;    
+}
+.footerCardImg2 img{
+    width: 100%;
+}
+.logoBox{
+    max-width: 180px;
+
+}
+.logoBox img{
+    width: 100%;
+}
+.footerText{
+    font-size: 16px;
+    color: black;
+    margin-right: 10px;
+}
+.bezperviynachalnovo-vzos{
+    font-size: 16px;
+    @include media(770px) {
+    margin: 20px auto
+    }
+}
+.bezperviynachalnovo-vzos span{
+    font-weight: 600;
+    font-size: 30px;
+    @include media(770px) {
+        font-size: 24px;
+    }
+}
