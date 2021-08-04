@@ -277,6 +277,10 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  a{
+    color: #000;
+    text-decoration: none;
+  }
 }
 
 @keyframes scale {

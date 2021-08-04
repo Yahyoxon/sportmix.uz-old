@@ -4,9 +4,10 @@ import { Container, Row, Col, Button } from "react-bootstrap";
 import "./singleproduct.scss";
 import Footer from "../Footer/Footer";
 
-const SingleProduct = ({ product }) => {
+const SingleProduct = ({ product,brands }) => {
   const history = useHistory();
   const { id } = useParams();
+  const [singleProductBrand, setSingleProductBrand] = useState({})
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -17,12 +18,23 @@ const SingleProduct = ({ product }) => {
       singleProduct = product[index];
     }
   }
+  useEffect(()=>{
+  const brandFinder=(brand)=>{
+    for (let i = 0; i < brand.length; i++) {
+      if (brand[i].link === singleProduct.brand_name) {
+        setSingleProductBrand(brand[i])
+      } 
+    }
+  }
+  brandFinder(brands)
+  },[brands,singleProduct.brand_name])
+ 
   const [mainImage, setMainImage] = useState('');
 
   useEffect(()=>{
     setMainImage(singleProduct.image)
   },[product,singleProduct.image])
-  
+ 
   const clickBtn = () => {
     localStorage.setItem("singleProductValue",JSON.stringify(singleProduct))
     history.push("/");
@@ -72,6 +84,12 @@ const SingleProduct = ({ product }) => {
 
             <Col lg="6" md="6" sm="12" className="centeredCol">
               <h3 className="title">{singleProduct.name}</h3>
+              <div className="brandsBox">
+                <div className="imageBoxSingle">
+                <img src={"https://admin.sportmix.uz/uploads/" + singleProductBrand.image} alt={singleProductBrand.name} />
+                </div>
+              <p className="brand">{singleProductBrand.name}</p>
+              </div>
               <p className="price">{singleProduct.price} сум</p>
               <p className="desc">{singleProduct.description}</p>
 

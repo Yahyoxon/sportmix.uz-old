@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import Calculator from "../../components/Calculator/Calculator";
 import "./product.scss";
@@ -9,8 +9,8 @@ import { VscClose } from "react-icons/vsc";
 // import Pagination from "react-js-pagination";
 
 const Product = (props) => {
+  const uploadURL = "https://admin.sportmix.uz/uploads/"
   const [selectedProduct, setselectedProduct] = useState([]);
-  const [catItem, setCatItem] = useState("");
   const [order, setOrder] = useState([]);
   const [prodOrder, setProdOrder] = useState([]);
   const [prodOrderPrice, setProdOrderPrice] = useState([]);
@@ -22,44 +22,32 @@ const Product = (props) => {
   const [filteredData, setFilteredData] = useState();
   const [wordEntered, setWordEntered] = useState("");
   const [notFound, setNotFound] = useState();
-
   // const [activePage, setActivePage] = useState(1);
-  // selection products
-  let selectedProdcutByCat = [];
-  if (catItem) {
-    for (let i = 0; i < props.product.length; i++) {
-      if (props.product[i].category_name === catItem) {
-        selectedProdcutByCat[i] = props.product[i];
-      }
-    }
-  } else {
-    selectedProdcutByCat = props.product;
-  }
-
-  // const [resultProduct, setResultProduct] = useState(selectedProdcutByCat);
+  // const [resultProduct, setResultProduct] = useState(props.product);
+  
   // //Pagination
   // const handlePageChange = (pageNumber) => {
   //   console.log(`active page is ${pageNumber}`);
   //   setActivePage(pageNumber);
   // };
+  // const perPageProduct = 20;
   // let paginationProduct = [];
-  // const perPageProduct = 5;
-
+  
   // const fetchProducts = () => {
   //   for (
   //     let k = activePage * perPageProduct - perPageProduct;
-  //     k < activePage * perPageProduct;
+  //     k < 1 * perPageProduct;
   //     k++
   //   ) {
-  //     paginationProduct[k] = selectedProdcutByCat[k];
+  //     paginationProduct[k] = props.product[k];
   //   }
   //   setResultProduct(paginationProduct);
   // };
   // useEffect(() => {
-  //   fetchProducts();
-  // },[activePage]);
-
-  /// filter brands
+  //    fetchProducts();
+  // },[activePage,props.product]);
+  
+  //  filter brands
   var chat_ID = "-1001247339615";
   for (let i = 0; i < props.brands.length; i++) {
     if (selectedProduct.brand_name === props.brands[i].link) {
@@ -84,7 +72,7 @@ const Product = (props) => {
   const handleFilter = (event) => {
     const searchWord = event.target.value;
     setWordEntered(searchWord);
-    const searchResult = selectedProdcutByCat.filter((value) => {
+    const searchResult = props.product.filter((value) => {
       return value.name.toLowerCase().includes(searchWord.toLowerCase());
     });
 
@@ -94,7 +82,7 @@ const Product = (props) => {
       setFilteredData(searchResult);
     }
     if (searchResult.length === 0) {
-      setNotFound(<h5 style={{textAlign:"center"}}>Ничего не найдено :(</h5>);
+      setNotFound(<h5 style={{ textAlign: "center" }}>Ничего не найдено :(</h5>);
     }
   };
   useEffect(() => {
@@ -119,21 +107,20 @@ const Product = (props) => {
             return (
               <Col key={i} lg="2" md="3" sm="3" xs="3">
                 <div className="catBox">
-                  <a href="#products">
+                  <Link to={`/categories/${categories.link}`}>
                     <div
                       className="imgBoxCat"
-                      onClick={() => setCatItem(categories.link)}
                     >
                       <div className="circle"></div>
                       <img
                         src={
-                          "https://admin.sportmix.uz/uploads/" +
+                          uploadURL +
                           categories.image
                         }
                         alt=""
                       />
                     </div>
-                  </a>
+                  </Link>
                   <div className="CatText">{categories.name}</div>
                 </div>
               </Col>
@@ -160,73 +147,73 @@ const Product = (props) => {
           <Row id="products">
             {notFound
               ? notFound
-              : (filteredData ? filteredData : selectedProdcutByCat).map(
-                  (product, i) => (
-                    <Col
-                      lg="3"
-                      md="4"
-                      xs="6"
-                      key={i}
-                      onClick={() => setselectedProduct(product)}
-                    >
-                      <div className="procuctCard">
-                        <div className="imgBox">
-                          <img
-                            src={
-                              "https://admin.sportmix.uz/uploads/" +
-                              product.image
-                            }
-                            alt=""
-                          />
-                          <div className="moreInfo">
-                            <Link to={`/product/${product.id}`}>подробные</Link>
-                          </div>
+              : props.product && (filteredData ? filteredData : props.product).map(
+                 (product, i) => (
+                  <Col
+                    lg="3"
+                    md="4"
+                    xs="6"
+                    key={i}
+                    onClick={() => setselectedProduct(product)}
+                  >
+                    <div className="procuctCard">
+                      <div className="imgBox">
+                        <img
+                          src={
+                            uploadURL +
+                            product.image
+                          }
+                          alt=""
+                        />
+                        <div className="moreInfo">
+                          <Link to={`/product/${product.id}`}>подробные</Link>
                         </div>
-                        <div className="productTexts">
-                          <h2 className="productName">{product.name}</h2>
-                          <div className="priceAndbutton">
-                            <p className="productPrice">
-                              {Number(product.price).toLocaleString()} сум
-                            </p>
-                            <div className="bottomButtons">
-                              <div
-                                className="orderr"
-                                onClick={() => {
-                                  setOpenModalClass("modalSection");
-                                }}
-                              >
-                                <Button
-                                  variant="outline-dark"
-                                  className="buttonkupitVrasrochka"
-                                  onClick={() => {
-                                    setOrder(product.name);
-                                    setProdOrder(product.brand_name);
-                                    setProdOrderPrice(product.price);
-                                  }}
-                                >
-                                  Заказать
-                                </Button>
-                              </div>
+                      </div>
+                      <div className="productTexts">
+                        <h2 className="productName">{product.name}</h2>
+                        <div className="priceAndbutton">
+                          <p className="productPrice">
+                            {Number(product.price).toLocaleString()} сум
+                          </p>
+                          <div className="bottomButtons">
+                            <div
+                              className="orderr"
+                              onClick={() => {
+                                setOpenModalClass("modalSection");
+                              }}
+                            >
                               <Button
                                 variant="outline-dark"
-                                className="buttonkupitVrasrochka rassrochka"
-                                href="#calcBox"
+                                className="buttonkupitVrasrochka"
+                                onClick={() => {
+                                  setOrder(product.name);
+                                  setProdOrder(product.brand_name);
+                                  setProdOrderPrice(product.price);
+                                }}
                               >
-                                Рассрочку
+                                Заказать
                               </Button>
                             </div>
+                            <Button
+                              variant="outline-dark"
+                              className="buttonkupitVrasrochka rassrochka"
+                              href="#calcBox"
+                            >
+                              Рассрочку
+                            </Button>
                           </div>
                         </div>
                       </div>
-                    </Col>
-                  )
-                )}
+                    </div>
+                  </Col>
+                )
+              )}
           </Row>
           <Row>
             {/* <Pagination
               activePage={activePage}
               itemsCountPerPage={perPageProduct}
-              totalItemsCount={450}
+              totalItemsCount={216}
               pageRangeDisplayed={5}
               onChange={handlePageChange}
             /> */}
@@ -314,12 +301,11 @@ const Product = (props) => {
                       <Link
                         to={`/${brands.link}`}
                         className="brandImage"
-                        onClick={() => setCatItem(brands.link)}
                       >
                         <div className="circle"></div>
                         <img
                           src={
-                            "https://admin.sportmix.uz/uploads/" + brands.image
+                            uploadURL + brands.image
                           }
                           alt=""
                         />

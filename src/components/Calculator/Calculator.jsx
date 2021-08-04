@@ -9,7 +9,7 @@ const Calculator = (props) => {
   const [phone, setPhone] = useState("");
   const [month, setmonth] = useState(12);
   const [successMessage, setSuccessMessage] = useState("");
- const singleProductValue = JSON.parse(localStorage.getItem('singleProductValue')) || ''
+  const singleProductValue = JSON.parse(localStorage.getItem('singleProductValue')) || ''
   const price = props.selectedProduct.price || singleProductValue.price;
   const name = props.selectedProduct.name || singleProductValue.name;
   const image = props.selectedProduct.image || singleProductValue.image;
@@ -49,19 +49,18 @@ const Calculator = (props) => {
       chat_ID = props.brands[i].telegram_chat_id || "-1001247339615"
     }
   }
-
-  
+    
   const onSubmit = (e) => {
     e.preventDefault();
     let api = new XMLHttpRequest();
-    var forSend = `🏪 Магазин: ${brand}%0A⏰ Рассрочку%0A%0A👥Имя: ${username}%0A📞Тел: ${phone}%0A📦Товар:+${name}%0A%0A📅Месяц: ${month}%0A💵Итого: ${num} сум%0A🌙Ежемесячная выплата: ${numByMonth} сум`;
+    var forSend = `🏪 Магазин: ${brand}%0A⏰ Рассрочку%0A%0A👥Имя: ${username}%0A📞Тел: ${phone}%0A📦Товар:+${name}%0A%0A📅Месяц: ${month}%0A💵Итого: ${num} сум%0A🌙Ежемесячная выплата: ${numByMonth} сум%0A https://admin.sportmix.uz/uploads/${image}`;
     var token = "1745885286:AAGnCac1rJJnQI2XIAUW8LL2_RN2MHN-SVE";
-    
     var url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_ID}&text=${forSend}`;
     api.open("GET", url, true);
     api.send();
     setUsername("");
     setPhone("");
+    if (name) {
     setSuccessMessage(
       <div className="modalSuccess">
         <div id="success-icon">
@@ -78,10 +77,33 @@ const Calculator = (props) => {
           <line x1="9" y1="-1" x2="1" y2="11" strokeWidth="2.5" />
         </svg>
         <h3>
-          <strong>Ваша заявка успешно отправлена</strong>
+          <strong>Ваша заявка успешно отправлена!</strong>
         </h3>
       </div>
-    );
+    );}
+    else  {
+      setSuccessMessage(
+        <div className="modalSuccess">
+          <div id="failure-icon">
+            <div></div>
+          </div>
+          <svg
+            id="close-modal"
+            xmlns="http://www.w3.org/2000/svg"
+            version="1.1"
+            viewBox="0 0 10 10"
+            onClick={closeModalButton}
+          >
+            <line x1="1" y1="-1" x2="9" y2="11" strokeWidth="2.5" />
+            <line x1="9" y1="-1" x2="1" y2="11" strokeWidth="2.5" />
+          </svg>
+          <h3>
+            <>Неудачная попытка! Нажмите на кнопку «рассрочку» товара, который хотите купить, чтобы оставить заявку!</>
+          </h3>
+        </div>
+      );}
+    
+   
   };
   
 

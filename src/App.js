@@ -8,6 +8,7 @@ import SinglePage from './pages/SinglePage'
 import PageNotFound from "./pages/PageNotFound";
 import Admin from "./pages/Admin";
 import HomeByBrand from './pages/HomeByBrand';
+import ProductsByCat from "./pages/ProductsCatPage";
 
 function App() {
   let user = localStorage.getItem("user")
@@ -33,7 +34,7 @@ function App() {
   useEffect(() => {
     async function getProducts() {
       const response = await axios.get("https://admin.sportmix.uz/api/products");
-      setProduct(response.data);
+      setProduct(response.data.reverse());
     }
     getProducts();
   }, []);
@@ -67,6 +68,12 @@ function App() {
 
           <Route path="/product/:id" >
             <SinglePage product={product} category={category} brands={brands} />
+          </Route>
+          <Route path="/categories/:link" >
+            <ProductsByCat product={product} category={category} brands={brands} />
+          </Route>
+          <Route path="/:id/:link" >
+            <ProductsByCat product={product} category={category} brands={brands} />
           </Route>
 
           {/* +++++++++++++++++++++ admin ++++++++++++++++++++++ */}

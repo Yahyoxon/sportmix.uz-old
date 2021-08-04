@@ -1,0 +1,326 @@
+import React, { useState, useEffect } from 'react'
+import { Button, Col, Container, Row,Navbar } from 'react-bootstrap'
+import { useParams } from 'react-router'
+import { Link } from 'react-router-dom'
+import Calculator from '../Calculator/Calculator'
+import { VscClose } from "react-icons/vsc";
+import cardImage from "../../assets/card.png";
+import cartPasport from "../../assets/passport.jpg";
+
+const ProductByCat = (props) => {
+    const api = "https://admin.sportmix.uz";
+    const { link } = useParams()
+    const { id } = useParams()
+    const [selectedProduct, setselectedProduct] = useState([]);
+    const [order, setOrder] = useState([]);
+    const [prodOrder, setProdOrder] = useState([]);
+    const [prodOrderPrice, setProdOrderPrice] = useState([]);
+    const [clientName, setName] = useState("");
+    const [clientphoneNumber, setPhoneNumber] = useState("");
+    const [openModalClass, setOpenModalClass] = useState("modalSectionHidden");
+    const [successModal, setSuccessModal] = useState("forHidden");
+    const orderPriceSplite = Number(prodOrderPrice).toLocaleString();
+    const [filteredData, setFilteredData] = useState();
+    const [wordEntered, setWordEntered] = useState("");
+    const [notFound, setNotFound] = useState();
+
+    var chat_ID = "-1001247339615";
+
+    for (let i = 0; i < props.brandsProps.length; i++) {
+        if (selectedProduct.brand_name === props.brandsProps[i].link) {
+            chat_ID = props.brandsProps[i].telegram_chat_id || "-1001247339615";
+        }
+    }
+    /// send telegram group
+
+    const onSubmitModal = (e) => {
+        e.preventDefault();
+        let api = new XMLHttpRequest();
+        var forSend = `🏪 Магазин: ${prodOrder}%0A💵 Наличными%0A%0A👥Имя: ${clientName}%0A📞Тел: ${clientphoneNumber}%0A📦Товар: ${order}%0A💵Итого: ${orderPriceSplite} сум%0A https://admin.sportmix.uz/uploads/${selectedProduct.image}`;
+        var token = "1745885286:AAGnCac1rJJnQI2XIAUW8LL2_RN2MHN-SVE";
+        var url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_ID}&text=${forSend}`;
+        api.open("GET", url, true);
+        api.send();
+        setName("");
+        setPhoneNumber("");
+        setSuccessModal("modalSuccessSubmit");
+        setOpenModalClass("forHidden");
+    };
+    //search
+    const handleFilter = (event) => {
+        const searchWord = event.target.value;
+        setWordEntered(searchWord);
+        console.log(searchWord);
+        const searchResult = props.selectedProductProps.filter((value) => {
+            return value.name.toLowerCase().includes(searchWord.toLowerCase());
+        });
+
+        if (event === "") {
+            setFilteredData([]);
+        } else {
+            setFilteredData(searchResult);
+        }
+        if (searchResult.length === 0) {
+            setNotFound(<h5 style={{ textAlign: "center" }}>Ничего не найдено :(</h5>);
+        }
+    };
+    useEffect(() => {
+        setNotFound()
+    }, [])
+    
+    let ProductByBrand = []
+    if (id) {
+        for (let index = 0; index < props.selectedProductProps.length; index++) {
+            if (id === props.selectedProductProps[index].brand_name) {
+                ProductByBrand[index] = props.selectedProductProps[index]
+            }
+            
+        }
+    }
+    else{
+        ProductByBrand = props.selectedProductProps
+    }
+    
+    return (
+        <>
+        <div className="headerContent">
+        <Container>
+          <Row style={{ alignItems: "center" }}>
+            <Col>
+              <Navbar expand="lg">
+                <Navbar.Brand className="logoBox">
+                  {props.brandsProps.map((brand, i) => {
+                    return id === brand.link ? (
+                      <div className="brandContent" key={i}>
+                        <img
+                          className="brandLogo"
+                          key={i}
+                          src={api + "/uploads/" + brand.image}
+                          alt={brand.name}
+                        />
+                        <div className="brandName">{brand.name}</div>
+                      </div>
+                    ) : (
+                      console.log("")
+                    );
+                  })}
+                </Navbar.Brand>
+              </Navbar>
+            </Col>
+            <Col>
+              <div className="callButton">
+                <a href="tel:+998712000277">
+                  <Button variant="outline-dark">+998 71 200-02-77</Button>
+                </a>
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+            <Calculator
+                brands={props.brandsProps}
+                selectedProduct={selectedProduct}
+            />
+            <br/><br/>
+            <Container>
+                <Row>
+                    {props.categoriesProps.map((cat, k) => {
+                        return link === cat.link ? (
+                            <Col
+                                lg="6"
+                                md="6"
+                                xs="12"
+                                key={k}>
+                                <h2>{cat.name}</h2>
+                            </Col>
+                        ) : ""
+                    })}
+                    <Col
+                     lg="6"
+                     md="6"
+                     xs="12">
+                        <div className="searchContainer">
+                            <input
+                                className="form-control searchInput"
+                                type="text"
+                                placeholder="Поиск товаров..."
+                                value={wordEntered}
+                                onChange={handleFilter}
+                            />
+                        </div>
+                        <br />
+                    </Col>
+                </Row>
+                <Row>
+                    {notFound
+                        ? notFound
+                        : (filteredData ? filteredData :ProductByBrand || props.selectedProductProps).map((product, i) => {
+                            return link === product.category_name ? (
+                                <Col
+                                    lg="3"
+                                    md="4"
+                                    xs="6"
+                                    key={i}
+                                    onClick={() => setselectedProduct(product)}
+                                >
+                                    <div className="procuctCard">
+                                        <div className="imgBox">
+                                            <img
+                                                src={
+                                                    "https://admin.sportmix.uz/uploads/" +
+                                                    product.image
+                                                }
+                                                alt=""
+                                            />
+                                            <div className="moreInfo">
+                                                <Link to={`/product/${product.id}`}>подробные</Link>
+                                            </div>
+                                        </div>
+                                        <div className="productTexts">
+                                            <h2 className="productName">{product.name}</h2>
+                                            <div className="priceAndbutton">
+                                                <p className="productPrice">
+                                                    {Number(product.price).toLocaleString()} сум
+                                                </p>
+                                                <div className="bottomButtons">
+                                                    <div
+                                                        className="orderr"
+                                                        onClick={() => {
+                                                            setOpenModalClass("modalSection");
+                                                        }}
+                                                    >
+                                                        <Button
+                                                            variant="outline-dark"
+                                                            className="buttonkupitVrasrochka"
+                                                            onClick={() => {
+                                                                setOrder(product.name);
+                                                                setProdOrder(product.brand_name);
+                                                                setProdOrderPrice(product.price);
+                                                            }}
+                                                        >
+                                                            Заказать
+                                                        </Button>
+                                                    </div>
+                                                    <Button
+                                                        variant="outline-dark"
+                                                        className="buttonkupitVrasrochka rassrochka"
+                                                        href="#calcBox"
+                                                    >
+                                                        Рассрочку
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Col>)
+                                : ""
+                        })}
+                    <div className={openModalClass}>
+                        <form className="mainModalContainer" onSubmit={onSubmitModal}>
+                            <div
+                                className="closeBtn"
+                                onClick={() => setOpenModalClass("forHidden")}
+                            >
+                                <VscClose />
+                            </div>
+                            <div className="inputFormBox">
+                                <label htmlFor="">
+                                    <b>Товар:</b> {order}
+                                </label>
+                                <input
+                                    type="text"
+                                    className="textsModalForm"
+                                    placeholder="Имя"
+                                    onChange={(e) => setName(e.target.value)}
+                                    value={clientName}
+                                />
+                                <input
+                                    type="text"
+                                    className="textsModalForm"
+                                    placeholder="Номер телефона"
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    value={clientphoneNumber}
+                                />
+                                <input
+                                    type="hidden"
+                                    className="textsModalForm"
+                                    placeholder="product"
+                                    value={order}
+                                />
+                                <button type="submit" className="buttonModal">
+                                    Отправить
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div className={successModal}>
+                        <div id="success-icon">
+                            <div></div>
+                        </div>
+                        <svg
+                            id="close-modal"
+                            xmlns="http://www.w3.org/2000/svg"
+                            version="1.1"
+                            viewBox="0 0 10 10"
+                            onClick={() => setSuccessModal("forHidden")}
+                        >
+                            <line x1="1" y1="-1" x2="9" y2="11" strokeWidth="2.5" />
+                            <line x1="9" y1="-1" x2="1" y2="11" strokeWidth="2.5" />
+                        </svg>
+                        <h3>
+                            <strong>Ваша заявка успешно отправлена</strong>
+                        </h3>
+                    </div>
+                </Row>
+
+            </Container>
+            <div className="footerSection">
+        <Container>
+          <Row className="footer-row">
+            <Col lg="4" md="4" sm="12">
+              <div className="logoBoxFooter">
+                {props.brandsProps.map((brand, i) => {
+                  return id === brand.link ? (
+                    <div className="brandContent" key={i}>
+                      <img
+                        className="brandLogo"
+                        key={i}
+                        src={api + "/uploads/" + brand.image}
+                        alt={brand.name}
+                      />{" "}
+                      <div className="brandName">{brand.name}</div>
+                    </div>
+                  ) : (
+                    console.log("")
+                  );
+                })}
+              </div>
+            </Col>
+            <Col lg="4" md="4" sm="12">
+              <div className="bezperviynachalnovo-vzos">
+                <span>0 сум</span> - Без первоначального взноса
+              </div>
+            </Col>
+            <Col lg="4" md="4" sm="12">
+              <div className="left-footer-box">
+                <div className="footerCardImg">
+                  <img src={cardImage} alt="" />
+                </div>
+                <div className="footerCardImg2">
+                  <img src={cartPasport} alt="" />
+                </div>
+                <div className="footerText">
+                  Для оформления договора требуется копия паспорта и пластиковой
+                  карты.
+                </div>
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+
+        </>
+    )
+}
+
+export default ProductByCat

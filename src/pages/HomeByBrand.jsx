@@ -5,11 +5,11 @@ import { Link, useParams } from "react-router-dom";
 import cardImage from "../assets/card.png";
 import cartPasport from "../assets/passport.jpg";
 import { VscClose } from "react-icons/vsc";
+import '../components/Product/product.scss'
 
 const HomeByBrand = (props) => {
   const api = "https://admin.sportmix.uz";
   const [selectedProduct, setselectedProduct] = useState([]);
-  const [catItem, setCatItem] = useState("");
   const [order, setOrder] = useState([]);
   const [prodOrder, setProdOrder] = useState([]);
   const [prodOrderPrice, setProdOrderPrice] = useState([]);
@@ -22,35 +22,25 @@ const HomeByBrand = (props) => {
   const [wordEntered, setWordEntered] = useState("");
   const [notFound, setNotFound] = useState();
   const { id } = useParams();
-  // selection products
-
-  let selectedProdcutByCat = [];
-  if (catItem) {
-    for (let i = 0; i < props.product.length; i++) {
-      if (props.product[i].category_name === catItem) {
-        selectedProdcutByCat[i] = props.product[i];
-      }
-    }
-  } else {
-    selectedProdcutByCat = props.product;
-  }
+console.log(id)
   useEffect(() => {
     window.scroll(0,0)
   },[id]);
+  
   /// filter brands
-
   var chat_ID = "-1001247339615";
   for (let i = 0; i < props.brands.length; i++) {
     if (selectedProduct.brand_name === props.brands[i].link) {
       chat_ID = props.brands[i].telegram_chat_id || "-1001247339615";
     }
   }
+  
   /// send telegram group
 
   const onSubmitModal = (e) => {
     e.preventDefault();
     let api = new XMLHttpRequest();
-    var forSend = `🏪 Магазин: ${prodOrder}%0A💵 Наличными%0A%0A👥Имя: ${clientName}%0A📞Тел: ${clientphoneNumber}%0A📦Товар: ${order}%0A💵Итого: ${orderPriceSplite} сум`;
+    var forSend = `🏪 Магазин: ${prodOrder}%0A💵 Наличными%0A%0A👥Имя: ${clientName}%0A📞Тел: ${clientphoneNumber}%0A📦Товар: ${order}%0A💵Итого: ${orderPriceSplite} сум%0A https://admin.sportmix.uz/uploads/${selectedProduct.image}`;
     var token = "1745885286:AAGnCac1rJJnQI2XIAUW8LL2_RN2MHN-SVE";
     var url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_ID}&text=${forSend}`;
     api.open("GET", url, true);
@@ -60,12 +50,13 @@ const HomeByBrand = (props) => {
     setSuccessModal("modalSuccessSubmit");
     setOpenModalClass("forHidden");
   };
+  
   //search
   const handleFilter = (event) => {
     const searchWord = event.target.value;
     setWordEntered(searchWord);
     console.log(searchWord);
-    const searchResult = selectedProdcutByCat.filter((value) => {
+    const searchResult = props.product.filter((value) => {
       return value.name.toLowerCase().includes(searchWord.toLowerCase());
     });
 
@@ -83,7 +74,6 @@ const HomeByBrand = (props) => {
     setNotFound()
   }, [wordEntered])
   
-
   return (
     <>
       <div className="headerContent">
@@ -100,7 +90,7 @@ const HomeByBrand = (props) => {
                           key={i}
                           src={api + "/uploads/" + brand.image}
                           alt={brand.name}
-                        />{" "}
+                        />
                         <div className="brandName">{brand.name}</div>
                       </div>
                     ) : (
@@ -136,14 +126,15 @@ const HomeByBrand = (props) => {
             return (
               <Col key={i} lg="2" md="3" sm="3" xs="3">
                 <div className="catBox">
+                <Link to={`/${id}/${categories.link}`}>
                   <div
                     className="imgBoxCat"
-                    onClick={() => setCatItem(categories.link)}
                   >
                     <div className="circle"></div>
                     <img src={api + "/uploads/" + categories.image} alt="" />
                   </div>
                   <div className="CatText">{categories.name}</div>
+                </Link>
                 </div>
               </Col>
             );
@@ -169,7 +160,7 @@ const HomeByBrand = (props) => {
           <Row>
           {notFound
               ? notFound
-              : (filteredData ? filteredData : selectedProdcutByCat).map(
+              : (filteredData ? filteredData : props.product).map(
                   (product, i) => {
                     return id === product.brand_name ?
                     <Col
@@ -182,9 +173,8 @@ const HomeByBrand = (props) => {
                       <div className="procuctCard">
                         <div className="imgBox">
                           <img
-                            src={
-                              "https://admin.sportmix.uz/uploads/" +
-                              product.image
+                              src={api+"/uploads/"+
+                               product.image
                             }
                             alt=""
                           />
