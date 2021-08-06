@@ -9,7 +9,7 @@ import { VscClose } from "react-icons/vsc";
 // import Pagination from "react-js-pagination";
 
 const Product = (props) => {
-  const uploadURL = "https://admin.sportmix.uz/uploads/"
+  const uploadURL = "https://admin.sportmix.uz/uploads/";
   const [selectedProduct, setselectedProduct] = useState([]);
   const [order, setOrder] = useState([]);
   const [prodOrder, setProdOrder] = useState([]);
@@ -22,9 +22,10 @@ const Product = (props) => {
   const [filteredData, setFilteredData] = useState();
   const [wordEntered, setWordEntered] = useState("");
   const [notFound, setNotFound] = useState();
+  const [activePageData, setActivePageData] = useState([]);
   // const [activePage, setActivePage] = useState(1);
   // const [resultProduct, setResultProduct] = useState(props.product);
-  
+
   // //Pagination
   // const handlePageChange = (pageNumber) => {
   //   console.log(`active page is ${pageNumber}`);
@@ -32,7 +33,7 @@ const Product = (props) => {
   // };
   // const perPageProduct = 20;
   // let paginationProduct = [];
-  
+
   // const fetchProducts = () => {
   //   for (
   //     let k = activePage * perPageProduct - perPageProduct;
@@ -46,7 +47,7 @@ const Product = (props) => {
   // useEffect(() => {
   //    fetchProducts();
   // },[activePage,props.product]);
-  
+
   //  filter brands
   var chat_ID = "-1001247339615";
   for (let i = 0; i < props.brands.length; i++) {
@@ -75,20 +76,33 @@ const Product = (props) => {
     const searchResult = props.product.filter((value) => {
       return value.name.toLowerCase().includes(searchWord.toLowerCase());
     });
-
     if (event === "") {
       setFilteredData([]);
     } else {
       setFilteredData(searchResult);
     }
     if (searchResult.length === 0) {
-      setNotFound(<h5 style={{ textAlign: "center" }}>Ничего не найдено :(</h5>);
+      setNotFound(
+        <h5 style={{ textAlign: "center" }}>Ничего не найдено :(</h5>
+      );
     }
   };
   useEffect(() => {
-    setNotFound()
-  }, [wordEntered])
+    setNotFound();
+  }, [wordEntered]);
 
+  useEffect(() => {
+    const handleProductActive = () => {
+      const activeProducts = [];
+      for (let l = 0; l < props.product.length; l++) {
+        if (props.product[l].order_type !== "none") {
+          activeProducts[l] = props.product[l];
+          setActivePageData(activeProducts);
+        }
+      }
+    };
+    handleProductActive();
+  }, [props.product]);
   return (
     <>
       <Calculator
@@ -108,17 +122,9 @@ const Product = (props) => {
               <Col key={i} lg="2" md="3" sm="3" xs="3">
                 <div className="catBox">
                   <Link to={`/categories/${categories.link}`}>
-                    <div
-                      className="imgBoxCat"
-                    >
+                    <div className="imgBoxCat">
                       <div className="circle"></div>
-                      <img
-                        src={
-                          uploadURL +
-                          categories.image
-                        }
-                        alt=""
-                      />
+                      <img src={uploadURL + categories.image} alt="" />
                     </div>
                   </Link>
                   <div className="CatText">{categories.name}</div>
@@ -147,67 +153,75 @@ const Product = (props) => {
           <Row id="products">
             {notFound
               ? notFound
-              : props.product && (filteredData ? filteredData : props.product).map(
-                 (product, i) => (
-                  <Col
-                    lg="3"
-                    md="4"
-                    xs="6"
-                    key={i}
-                    onClick={() => setselectedProduct(product)}
-                  >
-                    <div className="procuctCard">
-                      <div className="imgBox">
-                        <img
-                          src={
-                            uploadURL +
-                            product.image
-                          }
-                          alt=""
-                        />
-                        <div className="moreInfo">
-                          <Link to={`/product/${product.id}`}>подробные</Link>
+              : activePageData &&
+                (filteredData ? filteredData : activePageData).map(
+                  (product, i) => (
+                    <Col
+                      lg="3"
+                      md="4"
+                      xs="6"
+                      key={i}
+                      onClick={() => setselectedProduct(product)}
+                    >
+                      <div className="procuctCard">
+                        <div className="imgBox">
+                          <img src={uploadURL + product.image} alt="" />
+                          <div className="moreInfo">
+                            <Link to={`/product/${product.id}`}>подробные</Link>
+                          </div>
                         </div>
-                      </div>
-                      <div className="productTexts">
-                        <h2 className="productName">{product.name}</h2>
-                        <div className="priceAndbutton">
-                          <p className="productPrice">
-                            {Number(product.price).toLocaleString()} сум
-                          </p>
-                          <div className="bottomButtons">
-                            <div
-                              className="orderr"
-                              onClick={() => {
-                                setOpenModalClass("modalSection");
-                              }}
-                            >
-                              <Button
-                                variant="outline-dark"
-                                className="buttonkupitVrasrochka"
-                                onClick={() => {
-                                  setOrder(product.name);
-                                  setProdOrder(product.brand_name);
-                                  setProdOrderPrice(product.price);
-                                }}
-                              >
-                                Заказать
-                              </Button>
+                        <div className="productTexts">
+                          <h2 className="productName">{product.name}</h2>
+                          <div className="priceAndbutton">
+                            <p className="productPrice">
+                              {Number(product.price).toLocaleString()} сум
+                            </p>
+                            <div className="bottomButtons">
+                              {product.order_type === "all" ||
+                              product.order_type === "" ||
+                              product.order_type === "order" ? (
+                                <div
+                                  className="orderr"
+                                  onClick={() => {
+                                    setOpenModalClass("modalSection");
+                                  }}
+                                >
+                                  <Button
+                                    width="100%"
+                                    variant="outline-dark"
+                                    className="buttonkupitVrasrochka"
+                                    onClick={() => {
+                                      setOrder(product.name);
+                                      setProdOrder(product.brand_name);
+                                      setProdOrderPrice(product.price);
+                                    }}
+                                  >
+                                    Заказать
+                                  </Button>
+                                </div>
+                              ) : (
+                                ""
+                              )}
+                              {product.order_type === "all" ||
+                              product.order_type === "" ||
+                              product.order_type === "installment" ? (
+                                <Button
+                                  variant="outline-dark"
+                                  className="buttonkupitVrasrochka rassrochka"
+                                  href="#calcBox"
+                                >
+                                  Рассрочку
+                                </Button>
+                              ) : (
+                                ""
+                              )}
                             </div>
-                            <Button
-                              variant="outline-dark"
-                              className="buttonkupitVrasrochka rassrochka"
-                              href="#calcBox"
-                            >
-                              Рассрочку
-                            </Button>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </Col>
-                )
-              )}
+                    </Col>
+                  )
+                )}
           </Row>
           <Row>
             {/* <Pagination
@@ -298,17 +312,9 @@ const Product = (props) => {
                 {props.brands.map((brands, i) => {
                   return (
                     <SwiperSlide className="brand" key={i}>
-                      <Link
-                        to={`/${brands.link}`}
-                        className="brandImage"
-                      >
+                      <Link to={`/${brands.link}`} className="brandImage">
                         <div className="circle"></div>
-                        <img
-                          src={
-                            uploadURL + brands.image
-                          }
-                          alt=""
-                        />
+                        <img src={uploadURL + brands.image} alt="" />
                       </Link>
                       <div className="brandsText">{brands.name}</div>
                     </SwiperSlide>

@@ -21,6 +21,7 @@ const HomeByBrand = (props) => {
   const [filteredData, setFilteredData] = useState();
   const [wordEntered, setWordEntered] = useState("");
   const [notFound, setNotFound] = useState();
+  const [activePageData, setActivePageData] = useState([]);
   const { id } = useParams();
 console.log(id)
   useEffect(() => {
@@ -73,6 +74,19 @@ console.log(id)
   useEffect(() => {
     setNotFound()
   }, [wordEntered])
+  
+  useEffect(() => {
+    const handleProductActive = () => {
+      const activeProducts = [];
+      for (let l = 0; l < props.product.length; l++) {
+        if (props.product[l].order_type !== "none") {
+          activeProducts[l] = props.product[l];
+          setActivePageData(activeProducts);
+        }
+      }
+    };
+    handleProductActive();
+  }, [props.product]);
   
   return (
     <>
@@ -160,7 +174,7 @@ console.log(id)
           <Row>
           {notFound
               ? notFound
-              : (filteredData ? filteredData : props.product).map(
+              : (filteredData ? filteredData : activePageData).map(
                   (product, i) => {
                     return id === product.brand_name ?
                     <Col
@@ -189,6 +203,9 @@ console.log(id)
                               {Number(product.price).toLocaleString()} сум
                             </p>
                             <div className="bottomButtons">
+                            {product.order_type === "all" ||
+                              product.order_type === "" ||
+                              product.order_type === "order" ? (
                               <div
                                 className="orderr"
                                 onClick={() => {
@@ -207,13 +224,17 @@ console.log(id)
                                   Заказать
                                 </Button>
                               </div>
+                              ):("")}
+                              {product.order_type === "all" ||
+                              product.order_type === "" ||
+                              product.order_type === "installment" ? (
                               <Button
                                 variant="outline-dark"
                                 className="buttonkupitVrasrochka rassrochka"
                                 href="#calcBox"
                               >
                                 Рассрочку
-                              </Button>
+                              </Button>):("")}
                             </div>
                           </div>
                         </div>
