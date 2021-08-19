@@ -25,8 +25,8 @@ const Header = () => {
           </Col>
           <Col>
             <div className="callButton">
-              <a href="tel:+998712000277">
-                <Button variant="outline-dark">+998 71 200-02-77</Button>
+              <a href="tel:+998712000226">
+                <Button variant="outline-dark">+998 71 200-02-26</Button>
               </a>
             </div>
           </Col>

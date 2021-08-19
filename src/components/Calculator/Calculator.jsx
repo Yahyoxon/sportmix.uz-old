@@ -8,6 +8,8 @@ const Calculator = (props) => {
   const [username, setUsername] = useState("");
   const [phone, setPhone] = useState("");
   const [month, setmonth] = useState(12);
+  const [region, setRegion] = useState("Ташкент");
+  const [quantity, setQuantity] = useState("1");
   const [successMessage, setSuccessMessage] = useState("");
   const singleProductValue = JSON.parse(localStorage.getItem('singleProductValue')) || ''
   const price = props.selectedProduct.price || singleProductValue.price;
@@ -35,7 +37,7 @@ const Calculator = (props) => {
     default:
       break;
   }
-  const ndsPrice =  price * 1.15;
+  const ndsPrice = price * 1.15;
   const resultPrice = ndsPrice + (ndsPrice * procent);
   const num = Number(resultPrice).toLocaleString();
   const numByMonth = Number(Math.trunc(resultPrice / month)).toLocaleString()
@@ -43,17 +45,17 @@ const Calculator = (props) => {
     setSuccessMessage("");
   };
   //onsubmit
- var chat_ID = "-1001247339615"
-  for(let i = 0; i< props.brands.length;i++){
+  var chat_ID = "-1001247339615"
+  for (let i = 0; i < props.brands.length; i++) {
     if (brand === props.brands[i].link) {
       chat_ID = props.brands[i].telegram_chat_id || "-1001247339615"
     }
   }
-    
+
   const onSubmit = (e) => {
     e.preventDefault();
     let api = new XMLHttpRequest();
-    var forSend = `🏪 Магазин: ${brand}%0A⏰ Рассрочку%0A%0A👥Имя: ${username}%0A📞Тел: ${phone}%0A📦Товар:+${name}%0A%0A📅Месяц: ${month}%0A💵Итого: ${num} сум%0A🌙Ежемесячная выплата: ${numByMonth} сум%0A https://admin.sportmix.uz/uploads/${image}`;
+    var forSend = `🏪 Магазин: ${brand}%0A⏰ Рассрочку%0A%0A👥Имя: ${username}%0A📞Тел: ${phone}%0A📦Товар:+${name}%0A%0A📅Месяц: ${month}%0A💵Итого: ${num} сум%0A🌙Ежемесячная выплата: ${numByMonth} сум%0A📍 Регион: ${region}%0A🖇 Количество: ${quantity}%0A%0A https://admin.sportmix.uz/uploads/${image}`;
     var token = "1745885286:AAGnCac1rJJnQI2XIAUW8LL2_RN2MHN-SVE";
     var url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_ID}&text=${forSend}`;
     api.open("GET", url, true);
@@ -61,27 +63,28 @@ const Calculator = (props) => {
     setUsername("");
     setPhone("");
     if (name) {
-    setSuccessMessage(
-      <div className="modalSuccess">
-        <div id="success-icon">
-          <div></div>
+      setSuccessMessage(
+        <div className="modalSuccess">
+          <div id="success-icon">
+            <div></div>
+          </div>
+          <svg
+            id="close-modal"
+            xmlns="http://www.w3.org/2000/svg"
+            version="1.1"
+            viewBox="0 0 10 10"
+            onClick={closeModalButton}
+          >
+            <line x1="1" y1="-1" x2="9" y2="11" strokeWidth="2.5" />
+            <line x1="9" y1="-1" x2="1" y2="11" strokeWidth="2.5" />
+          </svg>
+          <h3>
+            <strong>Ваша заявка успешно отправлена!</strong>
+          </h3>
         </div>
-        <svg
-          id="close-modal"
-          xmlns="http://www.w3.org/2000/svg"
-          version="1.1"
-          viewBox="0 0 10 10"
-          onClick={closeModalButton}
-        >
-          <line x1="1" y1="-1" x2="9" y2="11" strokeWidth="2.5" />
-          <line x1="9" y1="-1" x2="1" y2="11" strokeWidth="2.5" />
-        </svg>
-        <h3>
-          <strong>Ваша заявка успешно отправлена!</strong>
-        </h3>
-      </div>
-    );}
-    else  {
+      );
+    }
+    else {
       setSuccessMessage(
         <div className="modalSuccess">
           <div id="failure-icon">
@@ -101,14 +104,15 @@ const Calculator = (props) => {
             <>Неудачная попытка! Нажмите на кнопку «рассрочку» товара, который хотите купить, чтобы оставить заявку!</>
           </h3>
         </div>
-      );}
-    
-   
+      );
+    }
+
+
   };
-  
+
 
   return (
-    
+
     <div id="calcBox">
       <Container>
         <Row>
@@ -125,7 +129,7 @@ const Calculator = (props) => {
           {name ? (
             <Col>
               <div className="selectedProductImage">
-                <Link to={`/product/${props.selectedProduct.id || singleProductValue.id }`}>
+                <Link to={`/product/${props.selectedProduct.id || singleProductValue.id}`}>
                   Свойства товаров
                 </Link>
               </div>
@@ -165,10 +169,9 @@ const Calculator = (props) => {
               <div className="title">Ежемесяцный платёж</div>
               <div className="valuePermonth value">
                 {resultPrice
-                
+
                   ? Number(Math.trunc(resultPrice / month)).toLocaleString()
-                  : 0}
-                сум
+                  : 0} сум
               </div>
             </div>
           </Col>
@@ -195,9 +198,10 @@ const Calculator = (props) => {
           ></Col>
         </Row>
         <Form onSubmit={onSubmit}>
-          <Row>
-            <Col lg="4" md="4" sm="12" className="mb-3">
+          <Row className="align-items-end">
+            <Col lg="2" md="2" sm="12" className="mb-3">
               <Form.Group>
+                
                 <Form.Control
                   type="hidden"
                   value={name ? name : " "}
@@ -214,30 +218,62 @@ const Calculator = (props) => {
                 />
               </Form.Group>
               <Form.Group>
-                {/* <Form.Label>Name</Form.Label> */}
+              <Form.Label>Имя</Form.Label>
                 <Form.Control
                   type="username"
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Имя"
                   required
                   value={username}
                 />
               </Form.Group>
             </Col>
-            <Col lg="4" md="4" sm="12" className="mb-3">
+            <Col lg="2" md="2" sm="12" className="mb-3">
               <Form.Group>
-                {/* <Form.Label>Phone number</Form.Label> */}
+              <Form.Label>Номер телефона</Form.Label>
                 <Form.Control
                   type="tel"
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Номер телефона"
+                  placeholder="+998901234567"
                   required
                   value={phone}
                 />
               </Form.Group>
             </Col>
+            <Col lg="2" md="2" sm="12" className="mb-3">
+              <Form.Group>
+              <Form.Label>Выберите регион</Form.Label>
+                <Form.Control as="select" onChange={(e) => setRegion(e.target.value)} required >
+                  <option selected value="Ташкент">Ташкент</option>
+                  <option value="Ташкентская область">Ташкентская область	</option>
+                  <option value="Андижанская область">Андижанская область</option>
+                  <option value="Бухарская область">Бухарская область</option>
+                  <option value="Джизакская область">Джизакская область</option>
+                  <option value="Кашкадарьинская область">Кашкадарьинская область</option>
+                  <option value="Навоийская область">Навоийская область</option>
+                  <option value="Наманганская область">Наманганская область</option>
+                  <option value="Самаркандская область">Самаркандская область</option>
+                  <option value="Сурхандарьинская область">Сурхандарьинская область</option>
+                  <option value="Сырдарьинская область">Сырдарьинская область</option>
+                  <option value="Ферганская область">Ферганская область</option>
+                  <option value="Хорезмская область">Хорезмская область	</option>
+                </Form.Control>
+              </Form.Group>
+            </Col>
+            <Col lg="2" md="2" sm="12" className="mb-3">
+              <Form.Group>
+              <Form.Label>Количество</Form.Label>
+                <Form.Control as="select" onChange={(e) => setQuantity(e.target.value)} required >
+                  <option selected value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </Form.Control>
+              </Form.Group>
+            </Col>
             <Col lg="4" md="4" sm="12" className="mb-3">
               <Form.Group>
+              <Form.Label></Form.Label>
                 <Form.Control
                   type="submit"
                   className="btn btn-dark"

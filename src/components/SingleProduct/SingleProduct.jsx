@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory, Link } from "react-router-dom";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import "./singleproduct.scss";
 import Footer from "../Footer/Footer";
-import { VscClose } from "react-icons/vsc";
+// import { VscClose } from "react-icons/vsc";
 import "../../components/Product/product.scss";
 
 const SingleProduct = ({ product, brands }) => {
@@ -14,8 +14,11 @@ const SingleProduct = ({ product, brands }) => {
   const [prodOrder, setProdOrder] = useState([]);
   const [prodOrderPrice, setProdOrderPrice] = useState([]);
   const [clientName, setName] = useState("");
+  const [region, setRegion] = useState("Ташкент");
+  const [quantity, setQuantity] = useState("1");
+  const [productImage, setProductImage] = useState("");
   const [clientphoneNumber, setPhoneNumber] = useState("");
-  const [openModalClass, setOpenModalClass] = useState("modalSectionHidden");
+  // const [openModalClass, setOpenModalClass] = useState("modalSectionHidden");
   const [successModal, setSuccessModal] = useState("forHidden");
   const orderPriceSplite = Number(prodOrderPrice).toLocaleString();
   useEffect(() => {
@@ -51,18 +54,38 @@ const SingleProduct = ({ product, brands }) => {
   };
   const chat_ID = singleProductBrand.telegram_chat_id;
   //send telegram
+
+  useEffect(() => {
+    setOrder(singleProduct.name);
+  }, [singleProduct.name])
+
+  useEffect(() => {
+    setProdOrder(singleProduct.brand_name);
+  }, [singleProduct.brand_name])
+
+  useEffect(() => {
+    setProdOrderPrice(singleProduct.price);
+  }, [singleProduct.price])
+
+  useEffect(() => {
+    setProductImage(singleProduct.image);
+  }, [singleProduct.image])
+
   const onSubmitModal = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     let api = new XMLHttpRequest();
-    var forSend = `🏪 Магазин: ${prodOrder}%0A💵 Наличными%0A%0A👥Имя: ${clientName}%0A📞Тел: ${clientphoneNumber}%0A📦Товар: ${order}%0A💵Итого: ${orderPriceSplite} сум`;
+    var forSend = `🏪 Магазин: ${prodOrder}%0A💵 Наличными%0A%0A👥Имя: ${clientName}%0A📞Тел: ${clientphoneNumber}%0A📦Товар: ${order}%0A💵Итого: ${orderPriceSplite} сум%0A📍 Регион: ${region}%0A🖇 Количество: ${quantity}%0A%0A https://admin.sportmix.uz/uploads/${productImage}`;
     var token = "1745885286:AAGnCac1rJJnQI2XIAUW8LL2_RN2MHN-SVE";
     var url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_ID}&text=${forSend}`;
     api.open("GET", url, true);
     api.send();
     setName("");
+    setRegion("");
+    setQuantity("");
+    setProductImage("");
     setPhoneNumber("");
     setSuccessModal("modalSuccessSubmit");
-    setOpenModalClass("forHidden");
+    // setOpenModalClass("forHidden");
   };
 
   return (
@@ -136,13 +159,121 @@ const SingleProduct = ({ product, brands }) => {
                   <p className="brand">{singleProductBrand.name}</p>
                 </Link>
               </div>
+              <Row className=" mb-3">
 
-              <p className="price">{Number(singleProduct.price).toLocaleString()} сум</p>
-              <p className="desc">{singleProduct.description}</p>
-              <div className="singleProductButtons">
+                <Col lg="6">
+                  <p className="price">{Number(singleProduct.price).toLocaleString()}сум </p>
+                </Col>
+                <Col lg="6">
+                {singleProduct.order_type === "all" || singleProduct.order_type === "" || singleProduct.order_type === "installment" ? (
+                  <Button className="orderButton" onClick={() => { clickBtn(); }} > Рассрочку </Button>) : ("")}
+                </Col>
+                
+
+              </Row>
+              <p className="desc"><span>Описание<br/></span><br/>{singleProduct.description}</p>
+
+              {/* 12312312312312312313123 */}
+
+              <form onSubmit={onSubmitModal}>
+
+                <div>
+                  <label className=" mb-1" htmlFor="">
+                    {/* <b>Товар:</b> {order} */}
+                    <b>Закажите прямо сейчас</b>
+                  </label>
+
+                  <Row>
+                    <Col lg="6">
+                      <Row>
+                        <Col lg="12" md="12">
+                          <Form.Group className="mb-3" controlId="formBasicName">
+                            <Form.Label>Имя</Form.Label>
+                            <Form.Control
+                              className=""
+                              type="text"
+                              onChange={(e) => setName(e.target.value)}
+                              required
+                              value={clientName}
+                            />
+                          </Form.Group>
+
+                        </Col>
+                        <Col lg="12" md="12">
+                          <Form.Group className="mb-3" controlId="formBasicTel">
+                            <Form.Label>Номер телефона</Form.Label>
+                            <Form.Control
+                              className=""
+                              type="tel"
+                              onChange={(e) => setPhoneNumber(e.target.value)}
+                              required
+                              value={clientphoneNumber}
+                            />
+                          </Form.Group>
+
+                        </Col>
+                        <Col lg="12" md="12">
+                          <Form.Group className="mb-3" controlId="formBasicRegion">
+                            <Form.Label>Выберите регион</Form.Label>
+                            <Form.Control className="" as="select" onChange={(e) => setRegion(e.target.value)} required >
+                              <option selected value="Ташкент">Ташкент</option>
+                              <option value="Ташкентская область">Ташкентская область	</option>
+                              <option value="Андижанская область">Андижанская область</option>
+                              <option value="Бухарская область">Бухарская область</option>
+                              <option value="Джизакская область">Джизакская область</option>
+                              <option value="Кашкадарьинская область">Кашкадарьинская область</option>
+                              <option value="Навоийская область">Навоийская область</option>
+                              <option value="Наманганская область">Наманганская область</option>
+                              <option value="Самаркандская область">Самаркандская область</option>
+                              <option value="Сурхандарьинская область">Сурхандарьинская область</option>
+                              <option value="Сырдарьинская область">Сырдарьинская область</option>
+                              <option value="Ферганская область">Ферганская область</option>
+                              <option value="Хорезмская область">Хорезмская область	</option>
+                            </Form.Control>
+                          </Form.Group>
+
+                        </Col>
+                        <Col lg="12" md="12">
+                          <Form.Group className="mb-3" controlId="formBasicQuantity">
+                            <Form.Label>Количество</Form.Label>
+                            <Form.Control as="select" className="" onChange={(e) => setQuantity(e.target.value)} required >
+                              <option selected value="1">1</option>
+                              <option value="2">2</option>
+                              <option value="3">3</option>
+                              <option value="4">4</option>
+                              <option value="5">5</option>
+                            </Form.Control>
+                          </Form.Group>
+
+                        </Col>
+                      </Row>
+
+                      <input type="hidden" className="" placeholder="product" value={order} />
+
+                      <Row className="singleProductButtons">
+                        {singleProduct.order_type === "all" ||
+                          singleProduct.order_type === "" ||
+                          singleProduct.order_type === "order" ? (
+                          <Col lg="12" md="12" >
+                            <Button className="zakazatButton" type="submit" variant="dark"  > Заказать </Button>
+                          </Col>) : ("")}
+
+                      </Row>
+                    </Col>
+                  </Row>
+
+
+
+                  {/* <button type="submit" className="buttonModal">
+                    Отправить
+                  </button> */}
+                </div>
+              </form>
+
+              {/* <div className="singleProductButtons">
                 {singleProduct.order_type === "all" ||
-                singleProduct.order_type === "" ||
-                singleProduct.order_type === "order" ? (
+                  singleProduct.order_type === "" ||
+                  singleProduct.order_type === "order" ? (
                   <div
                     className="orderr"
                     onClick={() => {
@@ -150,7 +281,7 @@ const SingleProduct = ({ product, brands }) => {
                     }}
                   >
                     <Button
-                    className="zakazatButton"
+                      className="zakazatButton"
                       variant="dark"
                       onClick={() => {
                         setOrder(singleProduct.name);
@@ -165,8 +296,8 @@ const SingleProduct = ({ product, brands }) => {
                   ""
                 )}
                 {singleProduct.order_type === "all" ||
-                singleProduct.order_type === "" ||
-                singleProduct.order_type === "installment" ? (
+                  singleProduct.order_type === "" ||
+                  singleProduct.order_type === "installment" ? (
                   <Button
                     className="orderButton"
                     onClick={() => {
@@ -178,11 +309,11 @@ const SingleProduct = ({ product, brands }) => {
                 ) : (
                   ""
                 )}
-              </div>
+              </div> */}
             </Col>
           </Row>
           <Row>
-            <div className={openModalClass}>
+            {/* <div className={openModalClass}>
               <form className="mainModalContainer" onSubmit={onSubmitModal}>
                 <div
                   className="closeBtn"
@@ -194,20 +325,46 @@ const SingleProduct = ({ product, brands }) => {
                   <label htmlFor="">
                     <b>Товар:</b> {order}
                   </label>
-                  <input
-                    type="text"
+                  <Form.Control
                     className="textsModalForm"
-                    placeholder="Имя"
+                    type="text"
                     onChange={(e) => setName(e.target.value)}
+                    placeholder="Имя"
+                    required
                     value={clientName}
                   />
-                  <input
-                    type="text"
+                  <Form.Control
                     className="textsModalForm"
-                    placeholder="Номер телефона"
+                    type="tel"
                     onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="Номер телефона"
+                    required
                     value={clientphoneNumber}
                   />
+                  <Form.Control className="textsModalForm" as="select" onChange={(e) => setRegion(e.target.value)} required >
+                    <option value="">Выберите регион</option>
+                    <option value="Ташкент">Ташкент</option>
+                    <option value="Ташкентская область">Ташкентская область	</option>
+                    <option value="Андижанская область">Андижанская область</option>
+                    <option value="Бухарская область">Бухарская область</option>
+                    <option value="Джизакская область">Джизакская область</option>
+                    <option value="Кашкадарьинская область">Кашкадарьинская область</option>
+                    <option value="Навоийская область">Навоийская область</option>
+                    <option value="Наманганская область">Наманганская область</option>
+                    <option value="Самаркандская область">Самаркандская область</option>
+                    <option value="Сурхандарьинская область">Сурхандарьинская область</option>
+                    <option value="Сырдарьинская область">Сырдарьинская область</option>
+                    <option value="Ферганская область">Ферганская область</option>
+                    <option value="Хорезмская область">Хорезмская область	</option>
+                  </Form.Control>
+                  <Form.Control as="select" className="textsModalForm" onChange={(e) => setQuantity(e.target.value)} required >
+                    <option value="">какой количество </option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </Form.Control>
                   <input
                     type="hidden"
                     className="textsModalForm"
@@ -219,7 +376,7 @@ const SingleProduct = ({ product, brands }) => {
                   </button>
                 </div>
               </form>
-            </div>
+            </div> */}
             <div className={successModal}>
               <div id="success-icon">
                 <div></div>

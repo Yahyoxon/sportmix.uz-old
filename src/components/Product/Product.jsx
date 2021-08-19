@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import Calculator from "../../components/Calculator/Calculator";
 import "./product.scss";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -7,6 +7,7 @@ import "swiper/swiper.min.css";
 import { Link } from "react-router-dom";
 import { VscClose } from "react-icons/vsc";
 // import Pagination from "react-js-pagination";
+import LazyLoad from 'react-lazyload';
 
 const Product = (props) => {
   const uploadURL = "https://admin.sportmix.uz/uploads/";
@@ -15,6 +16,8 @@ const Product = (props) => {
   const [prodOrder, setProdOrder] = useState([]);
   const [prodOrderPrice, setProdOrderPrice] = useState([]);
   const [clientName, setName] = useState("");
+  const [region, setRegion] = useState("Ташкент");
+  const [quantity, setQuantity] = useState("1");
   const [clientphoneNumber, setPhoneNumber] = useState("");
   const [openModalClass, setOpenModalClass] = useState("modalSectionHidden");
   const [successModal, setSuccessModal] = useState("forHidden");
@@ -59,13 +62,15 @@ const Product = (props) => {
   const onSubmitModal = (e) => {
     e.preventDefault();
     let api = new XMLHttpRequest();
-    var forSend = `🏪 Магазин: ${prodOrder}%0A💵 Наличными%0A%0A👥Имя: ${clientName}%0A📞Тел: ${clientphoneNumber}%0A📦Товар: ${order}%0A💵Итого: ${orderPriceSplite} сум`;
+    var forSend = `🏪 Магазин: ${prodOrder}%0A💵 Наличными%0A%0A👥 Имя: ${clientName}%0A📞 Тел: ${clientphoneNumber}%0A📦 Товар: ${order}%0A💵 Итого: ${orderPriceSplite} сум%0A📍 Регион: ${region}%0A🖇 Количество: ${quantity}%0A%0A https://admin.sportmix.uz/uploads/${selectedProduct.image}`;
     var token = "1745885286:AAGnCac1rJJnQI2XIAUW8LL2_RN2MHN-SVE";
     var url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_ID}&text=${forSend}`;
     api.open("GET", url, true);
     api.send();
     setName("");
     setPhoneNumber("");
+    setRegion("");
+    setQuantity("");
     setSuccessModal("modalSuccessSubmit");
     setOpenModalClass("forHidden");
   };
@@ -154,74 +159,76 @@ const Product = (props) => {
             {notFound
               ? notFound
               : activePageData &&
-                (filteredData ? filteredData : activePageData).map(
-                  (product, i) => (
-                    <Col
-                      lg="3"
-                      md="4"
-                      xs="6"
-                      key={i}
-                      onClick={() => setselectedProduct(product)}
-                    >
-                      <div className="procuctCard">
-                        <div className="imgBox">
+              (filteredData ? filteredData : activePageData).map(
+                (product, i) => (
+                  <Col
+                    lg="3"
+                    md="4"
+                    xs="6"
+                    key={i}
+                    onClick={() => setselectedProduct(product)}
+                  >
+                    <div className="procuctCard">
+                      <div className="imgBox">
+                        <LazyLoad height={300}>
                           <img src={uploadURL + product.image} alt="" />
-                          <div className="moreInfo">
-                            <Link to={`/product/${product.id}`}>подробные</Link>
-                          </div>
+                        </LazyLoad>
+                        <div className="moreInfo">
+                          <Link to={`/product/${product.id}`}>подробные</Link>
                         </div>
-                        <div className="productTexts">
-                          <h2 className="productName">{product.name}</h2>
-                          <div className="priceAndbutton">
-                            <p className="productPrice">
-                              {Number(product.price).toLocaleString()} сум
-                            </p>
-                            <div className="bottomButtons">
-                              {product.order_type === "all" ||
+                      </div>
+                      <div className="productTexts">
+                        <h2 className="productName">{product.name}</h2>
+                        <div className="priceAndbutton">
+                          <p className="productPrice">
+                            {Number(product.price).toLocaleString()} сум
+                          </p>
+                          <div className="bottomButtons">
+                            {product.order_type === "all" ||
                               product.order_type === "" ||
                               product.order_type === "order" ? (
-                                <div
-                                  className="orderr"
+                              <div
+                                className="orderr"
+                                onClick={() => {
+                                  setOpenModalClass("modalSection");
+                                }}
+                              >
+                                <Button
+                                  width="100%"
+                                  variant="outline-dark"
+                                  className="buttonkupitVrasrochka"
                                   onClick={() => {
-                                    setOpenModalClass("modalSection");
+                                    setOrder(product.name);
+                                    setProdOrder(product.brand_name);
+                                    setProdOrderPrice(product.price);
                                   }}
                                 >
-                                  <Button
-                                    width="100%"
-                                    variant="outline-dark"
-                                    className="buttonkupitVrasrochka"
-                                    onClick={() => {
-                                      setOrder(product.name);
-                                      setProdOrder(product.brand_name);
-                                      setProdOrderPrice(product.price);
-                                    }}
-                                  >
-                                    Заказать
-                                  </Button>
-                                </div>
-                              ) : (
-                                ""
-                              )}
-                              {product.order_type === "all" ||
+                                  Заказать
+                                </Button>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                            {product.order_type === "all" ||
                               product.order_type === "" ||
                               product.order_type === "installment" ? (
-                                <Button
-                                  variant="outline-dark"
-                                  className="buttonkupitVrasrochka rassrochka"
-                                  href="#calcBox"
-                                >
-                                  Рассрочку
-                                </Button>
-                              ) : (
-                                ""
-                              )}
-                            </div>
+                              <Button
+                                variant="outline-dark"
+                                className="buttonkupitVrasrochka rassrochka"
+                                href="#calcBox"
+                              >
+                                Рассрочку
+                              </Button>
+                            ) : (
+                              ""
+                            )}
                           </div>
                         </div>
                       </div>
-                    </Col>
-                  )
-                )}
+                    </div>
+                  </Col>
+                )
+              )}
           </Row>
           <Row>
             {/* <Pagination
@@ -245,23 +252,57 @@ const Product = (props) => {
                   <label htmlFor="">
                     <b>Товар:</b> {order}
                   </label>
-                  <input
-                    type="text"
-                    className="textsModalForm"
-                    placeholder="Имя"
-                    onChange={(e) => setName(e.target.value)}
-                    value={clientName}
-                  />
-                  <input
-                    type="text"
-                    className="textsModalForm"
-                    placeholder="Номер телефона"
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    value={clientphoneNumber}
-                  />
+                  <Form.Group className="w-100">
+                    <Form.Label className="w-100 mt-4">Имя</Form.Label>
+                    <Form.Control
+
+                      type="text"
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      value={clientName}
+                    />
+                  </Form.Group>
+                  <Form.Group className="w-100">
+                    <Form.Label className="w-100">Номер телефона</Form.Label>
+                    <Form.Control
+                      type="tel"
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="+998901234567"
+                      required
+                      value={clientphoneNumber}
+                    />
+                  </Form.Group>
+                  <Form.Group className="w-100">
+                    <Form.Label className="w-100">Выберите регион</Form.Label>
+                    <Form.Control as="select" onChange={(e) => setRegion(e.target.value)} required >
+                      <option selected value="Ташкент">Ташкент</option>
+                      <option value="Ташкентская область">Ташкентская область	</option>
+                      <option value="Андижанская область">Андижанская область</option>
+                      <option value="Бухарская область">Бухарская область</option>
+                      <option value="Джизакская область">Джизакская область</option>
+                      <option value="Кашкадарьинская область">Кашкадарьинская область</option>
+                      <option value="Навоийская область">Навоийская область</option>
+                      <option value="Наманганская область">Наманганская область</option>
+                      <option value="Самаркандская область">Самаркандская область</option>
+                      <option value="Сурхандарьинская область">Сурхандарьинская область</option>
+                      <option value="Сырдарьинская область">Сырдарьинская область</option>
+                      <option value="Ферганская область">Ферганская область</option>
+                      <option value="Хорезмская область">Хорезмская область	</option>
+                    </Form.Control>
+                  </Form.Group>
+                  <Form.Group className="w-100">
+                    <Form.Label className="w-100">Количество</Form.Label>
+                    <Form.Control as="select" onChange={(e) => setQuantity(e.target.value)} required >
+                      <option selected value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                    </Form.Control>
+                  </Form.Group>
                   <input
                     type="hidden"
-                    className="textsModalForm"
+
                     placeholder="product"
                     value={order}
                   />
